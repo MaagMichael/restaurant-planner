@@ -51,13 +51,15 @@ function App() {
 
   return (
     <>
-    <div className="max-w-[1000px] mx-auto">
-      <p>Table data:</p>
-      {tables.map((table) => (
-        <div key={table.id}>No.: {table.id}  x: {table.x}  y: {table.y}  Status: {table.status}  Typ: {table.typ} </div>
-      ))}
-
-    </div>
+      <div className="max-w-[1000px] mx-auto">
+        <p>Table data:</p>
+        {tables.map((table) => (
+          <div key={table.id}>
+            No.: {table.id} x: {table.x} y: {table.y} Status: {table.status}{" "}
+            Typ: {table.typ}{" "}
+          </div>
+        ))}
+      </div>
 
       <div className="text-center space-y-2">
         <p>Edit instructions</p>
@@ -66,13 +68,14 @@ function App() {
           Double Click - change table attributes for x and y position and table
           size small/big for layout adaption
         </p>
+        <p>Hover to see Table id information</p>
       </div>
       <div className="flex justify-center items-center ">
         <div className="relative w-[1000px] h-[600px] bg-gray-300 rounded-lg">
           {tables.map((table) => (
             <div
               key={table.id}
-              className={`absolute ${
+              className={`group absolute ${
                 table.typ === "big" ? "w-[100px]" : "w-[50px]"
               } h-[50px] bg-red-500 rounded flex items-center justify-center  font-bold cursor-pointer ${
                 table.status === "taken"
@@ -87,6 +90,10 @@ function App() {
               onDoubleClick={() => handleDoubleClick(table)}
             >
               {table.id}
+
+              <div className="invisible group-hover:visible absolute -top-8 left-1/2 transform -translate-x-1/2  bg-black text-white px-2 py-1 rounded text-sm whitespace-nowrap">
+                Table {table.id} - {table.status}
+              </div>
             </div>
           ))}
 
