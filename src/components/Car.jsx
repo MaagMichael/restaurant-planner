@@ -16,37 +16,49 @@ function Car() {
 
   // get finally valid reservations by name beside cancellations
   function getFinalRentals(logData) {
-    // Create a map to track reservations and cancellations
     const reservationMap = new Map();
-
-    // Process all events chronologically
+    const cancellations = [];
+  
     logData.forEach((entry) => {
       const key = `${entry.name}-${entry["start-date"]}-${entry["end-date"]}`;
-
+  
       if (entry.action === "reservation") {
         reservationMap.set(key, {
           name: entry.name,
           startDate: entry["start-date"],
           endDate: entry["end-date"],
+          timestamp: entry.timestamp
         });
       } else if (entry.action === "cancelation") {
+        cancellations.push({
+          name: entry.name,
+          startDate: entry["start-date"],
+          endDate: entry["end-date"],
+          timestamp: entry.timestamp
+        });
         reservationMap.delete(key);
       }
     });
-
-    // Convert active reservations to array and sort by date
+  
     const activeRentals = Array.from(reservationMap.values()).sort((a, b) =>
       a.startDate.localeCompare(b.startDate)
     );
-
+  
     return {
       activeRentals: activeRentals,
+      cancellations: cancellations.sort((a, b) => 
+        new Date(a.timestamp) - new Date(b.timestamp)
+      )
     };
   }
-  const FinalRentals = getFinalRentals(events);
+  const { activeRentals, cancellations } = getFinalRentals(events);
+  console.log(activeRentals);
+  console.log(cancellations);
 
   // counter for final reservations
-  const totalFinalRentals = FinalRentals.activeRentals.length;
+  const totalFinalRentals = activeRentals.length;
+  // counter for final cancellations
+  const totalFinalcancellations = cancellations.length;
 
   return (
     <div className="container mx-auto p-6">
@@ -119,7 +131,7 @@ function Car() {
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-200">
-          {FinalRentals.activeRentals.map((rental, index) => (
+          {activeRentals.map((rental, index) => (
             <tr key={index} className="hover:bg-gray-50">
               <td className="px-4 py-3 text-sm text-gray-700">{rental.name}</td>
               <td className="px-4 py-3 text-sm text-gray-700">
@@ -127,6 +139,45 @@ function Car() {
               </td>
               <td className="px-4 py-3 text-sm text-gray-700">
                 {formatDateToGerman(rental.endDate)}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      {/* table of cancellations */}
+      <p className="mt-8 mb-4 text-lg font-semibold">
+        All Cancellations: ({totalFinalcancellations})
+      </p>
+      <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
+        <thead className="bg-gray-100">
+          <tr>
+            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600">
+              Name
+            </th>
+            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600">
+              Start Date
+            </th>
+            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600">
+              End Date
+            </th>
+            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600">
+              Timestamp
+            </th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-gray-200">
+          {cancellations.map((cancel, index) => (
+            <tr key={index} className="hover:bg-gray-50">
+              <td className="px-4 py-3 text-sm text-gray-700">{cancel.name}</td>
+              <td className="px-4 py-3 text-sm text-gray-700">
+                {formatDateToGerman(cancel.startDate)}
+              </td>
+              <td className="px-4 py-3 text-sm text-gray-700">
+                {formatDateToGerman(cancel.endDate)}
+              </td>
+              <td className="px-4 py-3 text-sm text-gray-700">
+                {new Date(cancel.timestamp).toLocaleString("de-DE")}
               </td>
             </tr>
           ))}
