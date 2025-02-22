@@ -1,0 +1,24 @@
+Assuming you have loaded the JSON data into a table (say, called reservations) 
+with columns such as timestamp, start_date, end_date, action, and name, one common
+approach is to use a window function to determine the latest event (by timestamp)
+for each reservation (defined as the combination of name, start_date, and end_date).
+Then, you can filter those groups where the final action is a reservation. 
+For example, in PostgreSQL you might write:
+
+WITH LatestAction AS (
+  SELECT 
+    name, 
+    "start-date" AS start_date,
+    "end-date" AS end_date,
+    action,
+    timestamp,
+    ROW_NUMBER() OVER (
+      PARTITION BY name, "start-date", "end-date"
+      ORDER BY timestamp DESC
+    ) AS rn
+  FROM reservations
+)
+SELECT name, start_date, end_date
+FROM LatestAction
+WHERE rn = 1
+  AND action = 'reservation';

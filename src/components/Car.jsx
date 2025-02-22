@@ -52,8 +52,8 @@ function Car() {
     };
   }
   const { activeRentals, cancellations } = getFinalRentals(events);
-  console.log(activeRentals);
-  console.log(cancellations);
+  // console.log(activeRentals);
+  // console.log(cancellations);
 
   // counter for final reservations
   const totalFinalRentals = activeRentals.length;
@@ -139,6 +139,9 @@ function Car() {
               </td>
               <td className="px-4 py-3 text-sm text-gray-700">
                 {formatDateToGerman(rental.endDate)}
+              </td>
+              <td className="px-4 py-3 text-sm text-gray-700">
+                {new Date(rental.timestamp).toLocaleString("de-DE")}
               </td>
             </tr>
           ))}
